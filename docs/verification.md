@@ -10,7 +10,7 @@
 - **操作系统**：Microsoft Windows 11 家庭中文版（Build 22631）
 - **Qt Kit**：Desktop Qt 6.12.0 MSVC2022 64bit
 - **构建方式**：CMake（Qt Creator）
-- **当前验证素材**：内置资源 `:/pet/placeholder.gif`（`Luoxiaohei1.gif`，`QPixmap` 静态首帧绘制）
+- **当前验证素材**：内置资源 `:/pet/placeholder.gif`（`resources/pets/Luoxiaohei1.gif`，`QPixmap` 静态首帧绘制）
 
 ### 已实现范围
 - 无边框逐像素透明窗口（`Qt::FramelessWindowHint` + `Qt::WA_TranslucentBackground`）

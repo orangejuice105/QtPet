@@ -9,10 +9,15 @@ set(CMAKE_AUTORCC ON)
 
 qt_add_executable(QtPet
     WIN32 MACOSX_BUNDLE
-    main.cpp
-    petwindow.cpp
-    petwindow.h
-    resource.qrc
+    src/main.cpp
+    src/ui/petwindow.cpp
+    src/ui/petwindow.h
+    resources/resource.qrc
+)
+
+target_include_directories(QtPet
+    PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/src
 )
 
 target_link_libraries(QtPet

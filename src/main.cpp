@@ -1,4 +1,4 @@
-#include "petwindow.h"
+#include "ui/petwindow.h"
 
 #include <QApplication>
 
