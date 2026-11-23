@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/pet">
+        <file alias="placeholder.gif">Luoxiaohei1.gif</file>
+    </qresource>
+</RCC>

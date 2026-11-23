@@ -1,0 +1,35 @@
+# Build outputs
+build/
+out/
+cmake-build-*/
+CMakeFiles/
+CMakeCache.txt
+CMakeLists.txt.user*
+cmake_install.cmake
+
+# Qt Creator / IDE local files
+.qtcreator/
+.vs/
+.vscode/
+.idea/
+*.autosave
+
+# Compiled artifacts (in case of in-source builds)
+*.obj
+*.o
+*.exe
+*.dll
+*.lib
+*.pdb
+*.ilk
+*.exp
+
+# OS / temporary files
+.DS_Store
+Thumbs.db
+*.log
+*.tmp
+
+# Local non-QtPet directories & personal drafts in workspace
+qtcreator-codex-quota/
+Qt 桌面宠物项目架构设计与开发计划 v1.0.docx
