@@ -13,6 +13,7 @@ qt_add_executable(QtPet
     src/ui/petwindow.cpp
     src/ui/petwindow.h
     resources/resource.qrc
+    src/animation/frameplayer.h src/animation/frameplayer.cpp
 )
 
 target_include_directories(QtPet
