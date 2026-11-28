@@ -19,6 +19,7 @@ enum class PetClip{
 struct ClipData{
     QList<QPixmap> frames; //解出来的所有帧图片
     QList<int> delaysMs; //每帧对应的停留毫秒数
+    double footAnchorRatio = 1.0; //归一化脚底锚点比例(默认1.0)
 };
 
 class FramePlayer : public QObject
@@ -29,6 +30,7 @@ public:
 
     bool loadClip(PetClip clip,const QString& resourcePath); //加载一段GIF动画
     QPixmap currentFrame() const; //获取当前这一帧画面
+    double currentFootAnchorRatio() const; //查询当前激活片段的脚底锚点比例
 
     void play(PetClip clip); //切换并播指定动作片段
     void pause(); //暂停播放

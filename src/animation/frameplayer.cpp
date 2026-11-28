@@ -1,5 +1,32 @@
 #include "frameplayer.h"
 #include <QImageReader>
+#include <QImage>
+#include <algorithm>
+
+namespace {
+    int findVisibleBottomY(const QImage& image){
+        if(image.isNull() || image.width() <= 0 || image.height() <= 0){
+            return -1;
+        }
+        //如果加载的是没有透明通道的图片
+        if(!image.hasAlphaChannel()){
+            return image.height() - 1;
+        }
+
+        //自底向上扫描定底部高度
+        for(int y = image.height() - 1;y >= 0;y--){
+            for(int x = 0;x < image.width();x++){
+                //遇到非透明部分时
+                if(image.pixelColor(x,y).alpha() > 0){
+                    return y;
+                }
+            }
+        }
+
+        //没扫描到说明整张图透明
+        return -1;
+    }
+}
 
 FramePlayer::FramePlayer(QObject *parent) : QObject(parent){
     frameTimer_.setSingleShot(true); //开启单次触发模式
@@ -9,6 +36,8 @@ FramePlayer::FramePlayer(QObject *parent) : QObject(parent){
 bool FramePlayer::loadClip(PetClip clip,const QString& resourcePath){
     QImageReader reader(resourcePath); //读图器
     ClipData clipData; //存解析出来的图和时长
+
+    double maxFootRatio = 0.0; //最大脚底比例
 
     while(true){
         QImage frameImage = reader.read(); //读取当前帧并进行到下一帧
@@ -21,6 +50,12 @@ bool FramePlayer::loadClip(PetClip clip,const QString& resourcePath){
             //将解码得到的QImage转为适合屏幕高速绘制的QPixmap
             clipData.frames.append(QPixmap::fromImage(frameImage));
 
+            //计算最大脚底比例
+            int visibleBottomY = findVisibleBottomY(frameImage);
+            if(visibleBottomY >= 0){
+                maxFootRatio = std::max(maxFootRatio,static_cast<double>(visibleBottomY + 1) / static_cast<double>(frameImage.height()));
+            }
+
             int delayMs = reader.nextImageDelay(); //取出这一帧的停留毫秒数
             //读取帧间隔，对缺失或过小的异常值做下限兜底，防止高频重绘占满CPU
             if(delayMs < 20)delayMs = 100;
@@ -28,9 +63,14 @@ bool FramePlayer::loadClip(PetClip clip,const QString& resourcePath){
         }
     }
 
+
     //校验解码帧非空；失败时直接返回，不覆盖已有有效片段
     if(clipData.frames.isEmpty()){
         return false;
+    }
+
+    if(maxFootRatio > 0){
+        clipData.footAnchorRatio = maxFootRatio;
     }
     //存入QMap字典
     clips_.insert(clip,clipData);
@@ -64,12 +104,12 @@ void FramePlayer::play(PetClip clip){
     currentClip_ = clip;
     currentFrameIndex_ = 0; //从第0帧开始播
 
-    emit frameChanged(); //发出信号通知外面立刻画新片段第0帧
-
     //如果帧数大于1则提前准备
     if(it->frames.size() > 1){
         frameTimer_.start(it->delaysMs[currentFrameIndex_]);
     }
+
+    emit frameChanged(); //发出信号通知外面立刻画新片段第0帧
 }
 
 void FramePlayer::advanceFrame(){
@@ -82,9 +122,9 @@ void FramePlayer::advanceFrame(){
 
     currentFrameIndex_ = (currentFrameIndex_ + 1)%it->frames.size(); //取模推进下标循环
 
-    emit frameChanged();
-
     frameTimer_.start(it->delaysMs[currentFrameIndex_]);
+
+    emit frameChanged();
 }
 
 void FramePlayer::pause(){
@@ -93,6 +133,14 @@ void FramePlayer::pause(){
 
 PetClip FramePlayer::currentClip() const{
     return currentClip_;
+}
+
+double FramePlayer::currentFootAnchorRatio() const{
+    auto it = clips_.constFind(currentClip_);
+    if(it != clips_.constEnd()){
+        return it->footAnchorRatio;
+    }
+    return 1.0;
 }
 
 

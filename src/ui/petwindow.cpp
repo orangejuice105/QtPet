@@ -49,8 +49,12 @@ void PetWindow::paintEvent(QPaintEvent *){
     QSize drawSize = currentFrame.size().scaled(petCanvasSize_,Qt::KeepAspectRatio);
     //目标矩形的左上角X
     int drawX = footAnchor_.x() - drawSize.width() / 2; //左右居中对齐脚底点
+
+    double footAnchorRatio = framePlayer_.currentFootAnchorRatio(); //脚底比例
+    int visibleFootOffsetY = qRound(drawSize.height() * footAnchorRatio); //锁放后从图片顶边到可见脚底的竖直像素距离
+
     //目标矩形的左上角Y
-    int drawY = footAnchor_.y() - drawSize.height(); //让图片刚好踩在脚底线上
+    int drawY = footAnchor_.y() - visibleFootOffsetY; //让图片刚好踩在脚底线上
 
     QRect target(drawX,drawY,drawSize.width(),drawSize.height());
 
